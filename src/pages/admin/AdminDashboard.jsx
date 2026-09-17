@@ -49,9 +49,14 @@ export default function AdminDashboard() {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-6 border-b border-border">
           <div>
             <span className="text-label text-terracotta block mb-1">Store Operations</span>
-            <h1 className="font-serif text-3xl md:text-4xl font-bold text-forest">
-              Admin Overview
-            </h1>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden border border-emerald-600/30 shadow-md bg-white shrink-0 flex items-center justify-center">
+                <img src="/lotosphere-logo.jpg" alt="Lotosphere Logo" className="w-full h-full object-cover" />
+              </div>
+              <h1 className="font-serif text-3xl md:text-4xl font-bold text-forest">
+                Admin Overview
+              </h1>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">

@@ -62,8 +62,8 @@ export default function Navbar() {
             className="flex items-center gap-2.5 group"
             data-cursor="link"
           >
-            <div className="w-8 h-8 bg-emerald-950 border border-emerald-500/40 rounded-full flex items-center justify-center transition-transform duration-300 group-hover:scale-110 shadow-lg">
-              <Leaf size={15} className="text-amber-300" />
+            <div className="w-9 h-9 rounded-full overflow-hidden border border-emerald-500/40 transition-transform duration-300 group-hover:scale-105 shadow-lg bg-white/10 shrink-0 flex items-center justify-center">
+              <img src="/lotosphere-logo.jpg" alt="Lotosphere Logo" className="w-full h-full object-cover" />
             </div>
             <span className="font-serif text-2xl font-medium tracking-tight text-[#f5f2eb]">
               Lotosphere

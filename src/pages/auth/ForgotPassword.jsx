@@ -30,8 +30,8 @@ export default function ForgotPassword() {
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4" style={{ background: 'var(--color-cream)' }}>
       <div className="w-full max-w-md bg-white rounded-3xl p-8 md:p-10 shadow-2xl border border-border/50">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 bg-forest/10 rounded-full flex items-center justify-center mx-auto mb-4 text-forest">
-            <Leaf size={24} />
+          <div className="w-12 h-12 rounded-full overflow-hidden border border-emerald-600/30 mx-auto mb-4 shadow-md bg-white shrink-0 flex items-center justify-center">
+            <img src="/lotosphere-logo.jpg" alt="Lotosphere Logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="font-serif text-3xl font-bold text-forest">Reset Password</h1>
           <p className="text-sm text-muted mt-2">Enter your email to receive a password reset link</p>

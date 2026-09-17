@@ -56,6 +56,12 @@ export default function Login() {
         />
 
         <div className="text-center mb-6">
+          <Link to="/" className="inline-flex items-center gap-2 mb-3 group">
+            <div className="w-10 h-10 rounded-full overflow-hidden border border-emerald-600/30 shadow-md bg-white shrink-0 flex items-center justify-center">
+              <img src="/lotosphere-logo.jpg" alt="Lotosphere Logo" className="w-full h-full object-cover" />
+            </div>
+            <span className="font-serif text-2xl font-bold text-forest">Lotosphere</span>
+          </Link>
           <h1 className="font-serif text-3xl font-bold text-forest">Welcome Back</h1>
           <p className="text-sm text-muted mt-1">Sign in to your Lotosphere account</p>
         </div>
