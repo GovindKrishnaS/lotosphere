@@ -74,7 +74,7 @@ export default function Hero() {
       {PARTICLES.map((p, i) => (
         <div
           key={i}
-          className="particle hidden md:block z-20 pointer-events-none"
+          className="particle z-10 pointer-events-none select-none"
           style={{
             left: p.x,
             top: p.y,

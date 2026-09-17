@@ -4,23 +4,34 @@ import { useAuth } from '@/context/AuthContext'
 import { getUserOrders } from '@/services/orderService'
 import { updateProfile } from '@/services/authService'
 import { formatCurrency, formatDate, getStatusColor, getStatusLabel, formatOrderId } from '@/utils'
-import { User, Package, LogOut, ShieldCheck, Save, Mail, Phone, Calendar } from 'lucide-react'
+import { User, Package, LogOut, Save, Mail, Phone, MapPin, Building, Compass, CheckCircle2, Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function AccountDashboard() {
   const { user, profile, logout, refreshProfile, isAdmin } = useAuth()
   const [orders, setOrders] = useState([])
   const [loadingOrders, setLoadingOrders] = useState(true)
+  
+  // Profile Form States
   const [fullName, setFullName] = useState(profile?.full_name || '')
   const [phone, setPhone] = useState(profile?.phone || '')
+  const [address, setAddress] = useState(profile?.address || '')
+  const [city, setCity] = useState(profile?.city || '')
+  const [stateName, setStateName] = useState(profile?.state || '')
+  const [pincode, setPincode] = useState(profile?.pincode || '')
+  
   const [updating, setUpdating] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+  const [errors, setErrors] = useState({})
 
   useEffect(() => {
-    if (user?.id) {
-      getUserOrders(user.id)
+    if (user?.id || user?.email) {
+      getUserOrders(user?.id, user?.email)
         .then(setOrders)
         .catch(console.error)
         .finally(() => setLoadingOrders(false))
+    } else {
+      setLoadingOrders(false)
     }
   }, [user])
 
@@ -28,19 +39,61 @@ export default function AccountDashboard() {
     if (profile) {
       setFullName(profile.full_name || '')
       setPhone(profile.phone || '')
+      setAddress(profile.address || '')
+      setCity(profile.city || '')
+      setStateName(profile.state || '')
+      setPincode(profile.pincode || '')
     }
   }, [profile])
 
+  const validate = () => {
+    const newErrors = {}
+    if (!fullName.trim()) {
+      newErrors.fullName = 'Full name is required'
+    }
+    if (phone.trim() && phone.trim().length < 7) {
+      newErrors.phone = 'Please enter a valid contact number'
+    }
+    if (pincode.trim() && pincode.trim().length < 4) {
+      newErrors.pincode = 'Please enter a valid postal / PIN code'
+    }
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
   const handleUpdateProfile = async (e) => {
     e.preventDefault()
-    if (!user) return
+    if (!user) {
+      toast.error('You must be signed in to save profile details.')
+      return
+    }
+
+    if (!validate()) {
+      toast.error('Please resolve the highlighted form errors.')
+      return
+    }
+
     setUpdating(true)
+    setSaveSuccess(false)
     try {
-      await updateProfile(user.id, { full_name: fullName, phone })
+      const updates = {
+        full_name: fullName.trim(),
+        email: user.email,
+        phone: phone.trim(),
+        address: address.trim(),
+        city: city.trim(),
+        state: stateName.trim(),
+        pincode: pincode.trim(),
+      }
+
+      await updateProfile(user.id, updates)
       await refreshProfile()
-      toast.success('Profile updated successfully!')
+      setSaveSuccess(true)
+      toast.success('Customer profile saved successfully!')
+      setTimeout(() => setSaveSuccess(false), 4000)
     } catch (err) {
-      toast.error('Failed to update profile.')
+      console.error('Failed to update profile:', err)
+      toast.error(err.message || 'Failed to update customer profile.')
     } finally {
       setUpdating(false)
     }
@@ -52,9 +105,9 @@ export default function AccountDashboard() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 pb-8 border-b border-border">
           <div>
-            <span className="text-label text-sage block mb-2">User Portal</span>
+            <span className="text-label text-sage block mb-2">Member Sanctuary</span>
             <h1 className="font-serif text-3xl md:text-4xl font-bold text-forest">
-              Welcome, {profile?.full_name || user?.email || 'Plant Parent'}
+              Welcome, {profile?.full_name || user?.email?.split('@')[0] || 'Plant Parent'}
             </h1>
           </div>
 
@@ -71,69 +124,197 @@ export default function AccountDashboard() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Profile Form (Left) */}
-          <div className="lg:col-span-5 bg-white p-8 rounded-3xl shadow-xl border border-border/50 space-y-6">
-            <h2 className="font-serif text-xl font-bold text-forest flex items-center gap-2 pb-4 border-b border-border">
-              <User size={20} /> Personal Profile
-            </h2>
+          {/* Complete Customer Profile Form (Left) */}
+          <div className="lg:col-span-6 bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-border/50 space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-border">
+              <h2 className="font-serif text-xl font-bold text-forest flex items-center gap-2">
+                <User size={20} className="text-sage" /> Customer Details
+              </h2>
+              {saveSuccess && (
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200 animate-fadeIn">
+                  <CheckCircle2 size={13} /> Saved
+                </span>
+              )}
+            </div>
 
-            <form onSubmit={handleUpdateProfile} className="space-y-4">
+            <form onSubmit={handleUpdateProfile} className="space-y-4" noValidate>
+              {/* Full Name */}
               <div>
-                <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-2">
-                  Full Name
+                <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-1.5">
+                  Full Name <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Jane Doe"
-                  className="w-full px-4 py-3 rounded-xl border border-border bg-cream/20 text-charcoal text-sm outline-none focus:ring-2 ring-forest"
-                />
+                <div className="relative">
+                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+                  <input
+                    type="text"
+                    name="name"
+                    autoComplete="name"
+                    value={fullName}
+                    onChange={(e) => {
+                      setFullName(e.target.value)
+                      if (errors.fullName) setErrors(prev => ({ ...prev, fullName: null }))
+                    }}
+                    placeholder="e.g. Eleanor Vance"
+                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-cream/20 text-charcoal text-sm outline-none transition-all focus:ring-2 ring-forest ${
+                      errors.fullName ? 'border-red-500 bg-red-50/20' : 'border-border'
+                    }`}
+                  />
+                </div>
+                {errors.fullName && (
+                  <p className="text-xs text-red-600 mt-1">{errors.fullName}</p>
+                )}
               </div>
 
+              {/* Email (read-only) */}
               <div>
-                <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-2">
+                <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-1.5">
                   Email Address
                 </label>
                 <div className="relative">
-                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
+                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
                   <input
                     type="email"
-                    value={user?.email || ''}
+                    name="email"
+                    autoComplete="email"
+                    value={user?.email || profile?.email || ''}
                     disabled
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-gray-50 text-muted text-sm cursor-not-allowed"
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-gray-100/80 text-muted text-sm cursor-not-allowed select-none"
+                  />
+                </div>
+                <p className="text-[11px] text-muted mt-1">Authentication email linked to your account.</p>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-1.5">
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <Phone size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+                  <input
+                    type="tel"
+                    name="tel"
+                    inputMode="tel"
+                    autoComplete="tel"
+                    value={phone}
+                    onChange={(e) => {
+                      setPhone(e.target.value)
+                      if (errors.phone) setErrors(prev => ({ ...prev, phone: null }))
+                    }}
+                    placeholder="+91 98765 43210"
+                    className={`w-full pl-10 pr-4 py-3 rounded-xl border bg-cream/20 text-charcoal text-sm outline-none transition-all focus:ring-2 ring-forest ${
+                      errors.phone ? 'border-red-500 bg-red-50/20' : 'border-border'
+                    }`}
+                  />
+                </div>
+                {errors.phone && (
+                  <p className="text-xs text-red-600 mt-1">{errors.phone}</p>
+                )}
+              </div>
+
+              {/* Street Address */}
+              <div>
+                <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-1.5">
+                  Shipping Address
+                </label>
+                <div className="relative">
+                  <MapPin size={16} className="absolute left-3.5 top-3 text-muted" />
+                  <textarea
+                    rows={2}
+                    name="street-address"
+                    autoComplete="street-address"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    placeholder="Apartment, building, street name"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-border bg-cream/20 text-charcoal text-sm outline-none focus:ring-2 ring-forest resize-none"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-2">
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted" />
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98765 43210"
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-cream/20 text-charcoal text-sm outline-none focus:ring-2 ring-forest"
-                  />
+              {/* City & State (2 columns) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-1.5">
+                    City
+                  </label>
+                  <div className="relative">
+                    <Building size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+                    <input
+                      type="text"
+                      name="city"
+                      autoComplete="address-level2"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="e.g. Kochi"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-cream/20 text-charcoal text-sm outline-none focus:ring-2 ring-forest"
+                    />
+                  </div>
                 </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-1.5">
+                    State
+                  </label>
+                  <div className="relative">
+                    <Compass size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted" />
+                    <input
+                      type="text"
+                      name="state"
+                      autoComplete="address-level1"
+                      value={stateName}
+                      onChange={(e) => setStateName(e.target.value)}
+                      placeholder="e.g. Kerala"
+                      className="w-full pl-10 pr-4 py-3 rounded-xl border border-border bg-cream/20 text-charcoal text-sm outline-none focus:ring-2 ring-forest"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Pincode */}
+              <div>
+                <label className="block text-xs font-semibold text-charcoal uppercase tracking-wider mb-1.5">
+                  Pincode / Postal Code
+                </label>
+                <input
+                  type="text"
+                  name="postal-code"
+                  inputMode="numeric"
+                  autoComplete="postal-code"
+                  value={pincode}
+                  onChange={(e) => {
+                    setPincode(e.target.value)
+                    if (errors.pincode) setErrors(prev => ({ ...prev, pincode: null }))
+                  }}
+                  placeholder="e.g. 560001"
+                  className={`w-full px-4 py-3 rounded-xl border bg-cream/20 text-charcoal text-sm outline-none focus:ring-2 ring-forest ${
+                    errors.pincode ? 'border-red-500 bg-red-50/20' : 'border-border'
+                  }`}
+                />
+                {errors.pincode && (
+                  <p className="text-xs text-red-600 mt-1">{errors.pincode}</p>
+                )}
               </div>
 
               <button
                 type="submit"
                 disabled={updating}
-                className="w-full btn-primary py-3 justify-center text-sm mt-4 shadow-md disabled:opacity-50"
+                className="w-full btn-primary py-3.5 justify-center text-sm mt-4 shadow-lg disabled:opacity-50 transition-all font-medium"
               >
-                <Save size={16} /> Save Changes
+                {updating ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" /> Saving Details...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} /> Save Customer Details
+                  </>
+                )}
               </button>
             </form>
           </div>
 
           {/* Recent Orders Overview (Right) */}
-          <div className="lg:col-span-7 bg-white p-8 rounded-3xl shadow-xl border border-border/50 space-y-6">
+          <div className="lg:col-span-6 bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-border/50 space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-border">
               <h2 className="font-serif text-xl font-bold text-forest flex items-center gap-2">
                 <Package size={20} /> My Orders

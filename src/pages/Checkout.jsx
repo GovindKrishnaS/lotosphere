@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
@@ -16,12 +16,27 @@ export default function Checkout() {
     customerName: profile?.full_name || '',
     email: user?.email || '',
     phone: profile?.phone || '',
-    address: '',
-    city: '',
-    state: '',
-    pincode: '',
+    address: profile?.address || '',
+    city: profile?.city || '',
+    state: profile?.state || '',
+    pincode: profile?.pincode || '',
     notes: '',
   })
+
+  useEffect(() => {
+    if (profile || user) {
+      setFormData(prev => ({
+        ...prev,
+        customerName: prev.customerName || profile?.full_name || '',
+        email: prev.email || user?.email || '',
+        phone: prev.phone || profile?.phone || '',
+        address: prev.address || profile?.address || '',
+        city: prev.city || profile?.city || '',
+        state: prev.state || profile?.state || '',
+        pincode: prev.pincode || profile?.pincode || '',
+      }))
+    }
+  }, [profile, user])
 
   const [submitting, setSubmitting] = useState(false)
 
@@ -62,28 +77,10 @@ export default function Checkout() {
         quantity: i.quantity,
       }))
 
-      // Call authoritative RPC placeOrder
-      const result = await placeOrder({
-        customerName,
-        email,
-        phone,
-        address,
-        city,
-        state,
-        pincode,
-        notes: formData.notes,
-        items: orderItems,
-      })
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+      const isDemoMode = !supabaseUrl || supabaseUrl.includes('placeholder')
 
-      // Clear local/DB cart
-      await clearCart()
-
-      toast.success('Order placed successfully!')
-      navigate(`/order-success/${result.order_id}`)
-    } catch (err) {
-      console.error('Checkout error:', err)
-      // If RPC fails (e.g. Supabase credentials missing during local dev demo), create simulated success response so order flow demo is never broken!
-      if (err.message?.includes('placeholder') || err.message?.includes('fetch') || err.message?.includes('RPC')) {
+      if (isDemoMode) {
         const dummyOrderId = 'ord-' + Math.random().toString(36).substr(2, 9)
         await clearCart()
         toast.success('Order placed successfully! (Demo mode)')
@@ -104,9 +101,30 @@ export default function Checkout() {
             }
           }
         })
-      } else {
-        toast.error(err.message || 'Failed to place order. Please try again.')
+        return
       }
+
+      // Call authoritative RPC placeOrder
+      const result = await placeOrder({
+        customerName,
+        email,
+        phone,
+        address,
+        city,
+        state,
+        pincode,
+        notes: formData.notes,
+        items: orderItems,
+      })
+
+      // Clear local/DB cart
+      await clearCart()
+
+      toast.success('Order placed successfully!')
+      navigate(`/order-success/${result.order_id}`)
+    } catch (err) {
+      console.error('Checkout error:', err)
+      toast.error(err.message || 'Failed to place order. Please try again.')
     } finally {
       setSubmitting(false)
     }

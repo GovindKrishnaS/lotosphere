@@ -36,10 +36,23 @@ export function CartProvider({ children }) {
   }, [loadCart])
 
   const addItem = useCallback(async (product, quantity = 1) => {
+    let dbSuccess = false
     if (user) {
-      await addToDbCart(user.id, product.id, quantity)
-      await loadCart()
-    } else {
+      try {
+        await addToDbCart(user.id, product.id, quantity)
+        await loadCart()
+        dbSuccess = true
+      } catch (err) {
+        console.warn('⚠️ [CartContext] addToDbCart failed, syncing item to local state:', {
+          code: err.code,
+          message: err.message,
+          details: err.details,
+          hint: err.hint,
+        })
+      }
+    }
+
+    if (!user || !dbSuccess) {
       setItems(prev => {
         const existing = prev.find(i => i.product.id === product.id)
         let updated

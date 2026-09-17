@@ -37,15 +37,25 @@ export async function placeOrder({
 
 // ── Get User Orders ──────────────────────────────────────────
 
-export async function getUserOrders(userId) {
-  const { data, error } = await supabase
+export async function getUserOrders(userId, email = null) {
+  let query = supabase
     .from('orders')
     .select(`
-      id, total_amount, status, created_at, customer_name,
-      order_items(id, product_name, quantity, unit_price)
+      id, total_amount, status, created_at, customer_name, email,
+      order_items(id, product_name, quantity, unit_price, product_id)
     `)
-    .eq('user_id', userId)
-    .order('created_at', { ascending: false })
+
+  if (userId && email) {
+    query = query.or(`user_id.eq.${userId},email.eq.${email}`)
+  } else if (userId) {
+    query = query.eq('user_id', userId)
+  } else if (email) {
+    query = query.eq('email', email)
+  } else {
+    return []
+  }
+
+  const { data, error } = await query.order('created_at', { ascending: false })
   if (error) throw error
   return data || []
 }

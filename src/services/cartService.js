@@ -25,29 +25,82 @@ export function clearGuestCart() {
 // ── Authenticated cart (Supabase) ────────────────────────────
 
 export async function getDbCart(userId) {
-  const { data, error } = await supabase
-    .from('cart_items')
-    .select(`
-      id, quantity, product_id,
-      products(id, name, slug, price, sale_price, image_url, stock)
-    `)
-    .eq('user_id', userId)
-  if (error) throw error
-  return (data || []).map(item => ({
-    id: item.id,
-    quantity: item.quantity,
-    product: item.products,
-  }))
+  if (!userId) return []
+  try {
+    const { data, error } = await supabase
+      .from('cart_items')
+      .select(`
+        id, quantity, product_id,
+        products(id, name, slug, price, sale_price, image_url, stock)
+      `)
+      .eq('user_id', userId)
+
+    if (error) {
+      console.error('🌿 [Supabase getDbCart Error]:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      })
+      throw error
+    }
+    return (data || []).map(item => ({
+      id: item.id,
+      quantity: item.quantity,
+      product: item.products,
+    }))
+  } catch (err) {
+    console.warn('getDbCart query exception:', err.message)
+    throw err
+  }
 }
 
 export async function addToDbCart(userId, productId, quantity = 1) {
-  const { error } = await supabase
-    .from('cart_items')
-    .upsert(
-      { user_id: userId, product_id: productId, quantity },
-      { onConflict: 'user_id,product_id', ignoreDuplicates: false }
-    )
-  if (error) throw error
+  if (!userId || !productId) throw new Error('userId and productId are required')
+
+  try {
+    // Check existing item in db cart to increment quantity
+    const { data: existing, error: selectErr } = await supabase
+      .from('cart_items')
+      .select('id, quantity')
+      .eq('user_id', userId)
+      .eq('product_id', productId)
+      .maybeSingle()
+
+    if (selectErr && selectErr.code !== 'PGRST116') {
+      console.warn('cart_items select warning:', selectErr)
+    }
+
+    const finalQuantity = existing ? existing.quantity + quantity : quantity
+
+    const { error } = await supabase
+      .from('cart_items')
+      .upsert(
+        { user_id: userId, product_id: productId, quantity: finalQuantity, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id,product_id' }
+      )
+
+    if (error) {
+      console.error('🌿 [Supabase addToDbCart Error]:', {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        table: 'cart_items',
+        userId,
+        productId,
+      })
+      throw error
+    }
+  } catch (err) {
+    console.error('addToDbCart failed:', {
+      code: err.code || 'ERR_CART_WRITE',
+      message: err.message,
+      details: err.details || null,
+      hint: err.hint || null,
+    })
+    throw err
+  }
 }
 
 export async function updateDbCartItem(userId, productId, quantity) {
@@ -56,10 +109,19 @@ export async function updateDbCartItem(userId, productId, quantity) {
   }
   const { error } = await supabase
     .from('cart_items')
-    .update({ quantity })
+    .update({ quantity, updated_at: new Date().toISOString() })
     .eq('user_id', userId)
     .eq('product_id', productId)
-  if (error) throw error
+
+  if (error) {
+    console.error('🌿 [Supabase updateDbCartItem Error]:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    })
+    throw error
+  }
 }
 
 export async function removeFromDbCart(userId, productId) {
@@ -68,7 +130,16 @@ export async function removeFromDbCart(userId, productId) {
     .delete()
     .eq('user_id', userId)
     .eq('product_id', productId)
-  if (error) throw error
+
+  if (error) {
+    console.error('🌿 [Supabase removeFromDbCart Error]:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    })
+    throw error
+  }
 }
 
 export async function clearDbCart(userId) {
@@ -76,7 +147,16 @@ export async function clearDbCart(userId) {
     .from('cart_items')
     .delete()
     .eq('user_id', userId)
-  if (error) throw error
+
+  if (error) {
+    console.error('🌿 [Supabase clearDbCart Error]:', {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    })
+    throw error
+  }
 }
 
 // ── Merge guest cart into DB on login ───────────────────────

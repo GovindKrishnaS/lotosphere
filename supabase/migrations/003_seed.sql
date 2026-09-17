@@ -63,7 +63,7 @@ INSERT INTO public.products (
 
 -- 1. Monstera Deliciosa
 (
-  'p1000000-0000-0000-0000-000000000001',
+  'd1000000-0000-0000-0000-000000000001',
   'Monstera Deliciosa',
   'monstera-deliciosa',
   'The iconic Swiss Cheese Plant, beloved for its dramatic split leaves and effortless tropical energy. A statement-maker in any living space, the Monstera rewards minimal care with spectacular growth and architectural form.',
@@ -80,7 +80,7 @@ INSERT INTO public.products (
 
 -- 2. Snake Plant
 (
-  'p2000000-0000-0000-0000-000000000002',
+  'd2000000-0000-0000-0000-000000000002',
   'Snake Plant',
   'snake-plant',
   'The Snake Plant (Sansevieria) is the ultimate resilient houseplant. Its striking upright sword-like leaves in deep green with golden edges bring a graphic, sculptural quality to any space. One of the best air purifiers available.',
@@ -97,7 +97,7 @@ INSERT INTO public.products (
 
 -- 3. Fiddle Leaf Fig
 (
-  'p3000000-0000-0000-0000-000000000003',
+  'd3000000-0000-0000-0000-000000000003',
   'Fiddle Leaf Fig',
   'fiddle-leaf-fig',
   'The Fiddle Leaf Fig is the undisputed king of interior design. Its large, glossy violin-shaped leaves create an instant focal point and bring a lush, editorial quality to any room. A true design icon.',
@@ -114,7 +114,7 @@ INSERT INTO public.products (
 
 -- 4. Peace Lily
 (
-  'p4000000-0000-0000-0000-000000000004',
+  'd4000000-0000-0000-0000-000000000004',
   'Peace Lily',
   'peace-lily',
   'Graceful white blooms rise above deep green foliage in the Peace Lily — one of the few flowering plants that thrives in lower light. A symbol of tranquility and one of NASA''s top air-purifying plants.',
@@ -130,7 +130,7 @@ INSERT INTO public.products (
 
 -- 5. ZZ Plant
 (
-  'p5000000-0000-0000-0000-000000000005',
+  'd5000000-0000-0000-0000-000000000005',
   'ZZ Plant',
   'zz-plant',
   'The Zamioculcas zamiifolia is practically indestructible. With its waxy, deep-green leaves and architectural upright form, the ZZ thrives on neglect — perfect for frequent travelers or low-light spaces.',
@@ -146,7 +146,7 @@ INSERT INTO public.products (
 
 -- 6. Areca Palm
 (
-  'p6000000-0000-0000-0000-000000000006',
+  'd6000000-0000-0000-0000-000000000006',
   'Areca Palm',
   'areca-palm',
   'Bring the tropics home with the elegant Areca Palm. Its feathery, arching fronds create movement and natural humidity, transforming any corner into a lush tropical retreat. One of the most effective natural air humidifiers.',
@@ -162,7 +162,7 @@ INSERT INTO public.products (
 
 -- 7. Philodendron Heartleaf
 (
-  'p7000000-0000-0000-0000-000000000007',
+  'd7000000-0000-0000-0000-000000000007',
   'Philodendron Heartleaf',
   'philodendron-heartleaf',
   'The Heartleaf Philodendron is a natural born cascader with lush heart-shaped leaves that trail beautifully from shelves and hanging planters. Fast-growing, forgiving, and endlessly charming — a perfect companion plant.',
@@ -178,7 +178,7 @@ INSERT INTO public.products (
 
 -- 8. Calathea Orbifolia
 (
-  'p8000000-0000-0000-0000-000000000008',
+  'd8000000-0000-0000-0000-000000000008',
   'Calathea Orbifolia',
   'calathea-orbifolia',
   'The Calathea Orbifolia is one of the most spectacular foliage plants in existence. Its large, silvery-green leaves with elegant dark stripes are works of art. Known to move its leaves throughout the day — truly a living sculpture.',
@@ -194,7 +194,7 @@ INSERT INTO public.products (
 
 -- 9. Pothos Golden
 (
-  'p9000000-0000-0000-0000-000000000009',
+  'd9000000-0000-0000-0000-000000000009',
   'Golden Pothos',
   'golden-pothos',
   'The Golden Pothos is the perfect starter plant — virtually indestructible with gorgeous golden-variegated heart-shaped leaves. Trails magnificently from high shelves or climbs a moss pole. The world''s most popular houseplant for good reason.',
@@ -210,7 +210,7 @@ INSERT INTO public.products (
 
 -- 10. Echeveria Succulent
 (
-  'p1000000-0000-0000-0000-000000000010',
+  'd1000000-0000-0000-0000-000000000010',
   'Echeveria Elegans',
   'echeveria-elegans',
   'The Echeveria Elegans is a jewel-like succulent with perfect rosette form in soft blue-green with pink-tipped leaves. Requires almost no water and thrives on bright sun — stunning in clusters or as a single sculptural accent.',
@@ -226,7 +226,7 @@ INSERT INTO public.products (
 
 -- 11. Bird of Paradise
 (
-  'p1100000-0000-0000-0000-000000000011',
+  'd1100000-0000-0000-0000-000000000011',
   'Bird of Paradise',
   'bird-of-paradise',
   'The Bird of Paradise is nature''s own sculpture — towering paddle-shaped leaves on long elegant stems create a dramatic silhouette that commands attention. The signature statement plant of the contemporary interior.',
@@ -242,7 +242,7 @@ INSERT INTO public.products (
 
 -- 12. Spider Plant
 (
-  'p1200000-0000-0000-0000-000000000012',
+  'd1200000-0000-0000-0000-000000000012',
   'Spider Plant',
   'spider-plant',
   'Cheerful, fast-growing and practically indestructible, the Spider Plant is beloved for its arching striped foliage and cascading baby plantlets. One of the most effective air purifiers and completely safe for pets and children.',

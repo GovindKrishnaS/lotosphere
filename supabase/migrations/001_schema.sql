@@ -16,6 +16,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   full_name   TEXT,
   phone       TEXT,
   avatar_url  TEXT,
+  address     TEXT,
+  city        TEXT,
+  state       TEXT,
+  pincode     TEXT,
   is_admin    BOOLEAN NOT NULL DEFAULT FALSE,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -170,6 +174,48 @@ CREATE TRIGGER orders_updated_at
   FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
 
 -- ============================================================
+-- PLANT REVIEWS
+-- Customer reviews for individual products
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.plant_reviews (
+  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  customer_name TEXT NOT NULL,
+  product_id    UUID REFERENCES public.products(id) ON DELETE SET NULL,
+  rating        INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  review        TEXT,
+  photo_url     TEXT,
+  status        TEXT NOT NULL DEFAULT 'pending' CHECK (
+                  status IN ('pending', 'approved', 'featured', 'rejected', 'hidden')
+                ),
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER plant_reviews_updated_at
+  BEFORE UPDATE ON public.plant_reviews
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+-- ============================================================
+-- COMPANY FEEDBACK
+-- General company / service feedback
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.company_feedback (
+  id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  customer_name TEXT NOT NULL,
+  rating        INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  feedback      TEXT,
+  status        TEXT NOT NULL DEFAULT 'pending' CHECK (
+                  status IN ('pending', 'approved', 'featured', 'rejected', 'hidden')
+                ),
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TRIGGER company_feedback_updated_at
+  BEFORE UPDATE ON public.company_feedback
+  FOR EACH ROW EXECUTE FUNCTION public.handle_updated_at();
+
+-- ============================================================
 -- FUNCTION: Auto-create profile on signup
 -- ============================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -303,3 +349,10 @@ BEGIN
   );
 END;
 $$;
+
+-- Grant execution privileges to anon and authenticated roles
+GRANT EXECUTE ON FUNCTION public.place_order(TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, TEXT, JSONB) TO anon, authenticated;
+
+-- Notify PostgREST to reload schema cache
+NOTIFY pgrst, 'reload schema';
+

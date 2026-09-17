@@ -12,11 +12,13 @@ export default function OrdersPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (user?.id) {
-      getUserOrders(user.id)
+    if (user?.id || user?.email) {
+      getUserOrders(user?.id, user?.email)
         .then(setOrders)
         .catch(console.error)
         .finally(() => setLoading(false))
+    } else {
+      setLoading(false)
     }
   }, [user])
 
