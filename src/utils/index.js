@@ -67,3 +67,13 @@ export function getStatusLabel(status) {
 export function cn(...classes) {
   return classes.filter(Boolean).join(' ')
 }
+
+export const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || ''
+
+export function getWhatsAppUrl(customText = 'Hello Lotosphere! I recently submitted a review and would like to claim my special offer.') {
+  if (!WHATSAPP_NUMBER) return null
+  const cleaned = WHATSAPP_NUMBER.replace(/[^0-9]/g, '')
+  if (!cleaned) return null
+  return `https://wa.me/${cleaned}?text=${encodeURIComponent(customText)}`
+}
+

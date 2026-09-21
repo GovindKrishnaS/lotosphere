@@ -70,7 +70,7 @@ export default function BrandStory() {
             </div>
 
             <RouterLink
-              to="/about"
+              to="/our-story"
               className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl text-xs font-mono uppercase tracking-wider bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-500/40 text-emerald-200 transition-all shadow-lg"
               data-cursor="link"
             >

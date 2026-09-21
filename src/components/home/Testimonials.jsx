@@ -13,7 +13,7 @@ export default function Testimonials() {
   useEffect(() => {
     async function loadReviews() {
       try {
-        const data = await feedbackService.getFeaturedPlantReviews()
+        const data = await feedbackService.getFeaturedCompanyReviews()
         if (data && data.length > 0) {
           setReviews(data)
         }
@@ -28,11 +28,11 @@ export default function Testimonials() {
   const prev = () => setCurrent((prev) => (prev - 1 + (reviews.length || 1)) % (reviews.length || 1))
 
   const item = reviews[current] || {
-    customer_name: 'Elena Vance',
+    customer_name: 'Julian Sterling',
+    customer_title: 'Landscape Architect, Kochi',
     rating: 5,
-    review: 'The split leaves on this Monstera are breathtaking. Arrived in pristine condition and rooted immediately!',
-    photo_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80',
-    products: { name: 'Monstera Deliciosa' },
+    review: 'Lotosphere has redefined how I interact with living spaces. Packaging was eco-friendly and 100% plastic-free with pristine healthy specimens.',
+    photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80',
   }
 
   return (
@@ -106,7 +106,7 @@ export default function Testimonials() {
                 <div>
                   <h4 className="text-sm sm:text-base font-semibold text-amber-200 font-display">{item.customer_name}</h4>
                   <p className="text-xs font-mono text-[#8c887b] mt-0.5">
-                    Specimen: <span className="text-emerald-400">{item.products?.name || item.product_name || 'Monstera Deliciosa'}</span>
+                    {item.customer_title || (item.products?.name ? `Specimen: ${item.products.name}` : 'Verified Botanical Patron')}
                   </p>
                 </div>
               </div>

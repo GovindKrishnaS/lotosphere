@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { ShoppingBag, Search, User, Menu, X, Leaf } from 'lucide-react'
+import { ShoppingBag, Search, Menu, X, Leaf } from 'lucide-react'
 import { useCart } from '@/context/CartContext'
-import { useAuth } from '@/context/AuthContext'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const navLinks = [
@@ -10,6 +9,7 @@ const navLinks = [
   { label: 'Shop Specimens', to: '/shop' },
   { label: 'Biomes', to: '/shop?view=collections' },
   { label: 'Plant Care', to: '/plant-care' },
+  { label: 'Our Story', to: '/our-story' },
   { label: 'Heritage', to: '/about' },
 ]
 
@@ -19,7 +19,6 @@ export default function Navbar() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const { itemCount, setIsOpen } = useCart()
-  const { user } = useAuth()
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -102,16 +101,6 @@ export default function Navbar() {
             >
               <Search size={18} />
             </button>
-
-            {/* Account (Always routes to member account/login, no public admin exposure) */}
-            <Link
-              to={user ? '/account' : '/auth/login'}
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-[#f5f2eb] transition-all border border-white/5 hover:border-emerald-500/30 hidden sm:flex"
-              aria-label={user ? 'Account' : 'Login'}
-              data-cursor="link"
-            >
-              <User size={18} />
-            </Link>
 
             {/* Cart Button */}
             <button
@@ -196,16 +185,6 @@ export default function Navbar() {
                   </motion.div>
                 ))}
 
-                <div className="mt-6 pt-6 border-t border-emerald-950">
-                  <Link
-                    to={user ? '/account' : '/auth/login'}
-                    onClick={() => setMobileOpen(false)}
-                    className="flex items-center gap-3 py-3 px-4 rounded-xl text-xs font-mono uppercase tracking-wider text-[#a39e8f] hover:bg-emerald-950/40 hover:text-white transition-colors"
-                  >
-                    <User size={16} />
-                    {user ? 'My Sanctuary Account' : 'Member Login'}
-                  </Link>
-                </div>
               </div>
             </motion.div>
           </>

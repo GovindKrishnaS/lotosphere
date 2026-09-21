@@ -125,8 +125,8 @@ export default function OrderSuccess() {
 
           {/* Action buttons */}
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/account/orders" className="btn-primary" data-cursor="link">
-              <Package size={16} /> View Order Status
+            <Link to="/" className="btn-primary" data-cursor="link">
+              Return to Home
             </Link>
             <Link to="/shop" className="btn-secondary" data-cursor="link">
               Continue Shopping

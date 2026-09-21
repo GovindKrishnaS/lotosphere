@@ -30,8 +30,38 @@ export default function Signup() {
 
     setSubmitting(true)
     try {
-      await register(email, password, fullName)
-      toast.success('Account created successfully!')
+      const data = await register(email, password, fullName)
+      
+      // If Supabase session is not immediately available, email confirmation is required
+      const needsConfirmation = !data?.session
+
+      if (needsConfirmation) {
+        toast((t) => (
+          <div className="flex flex-col gap-1 text-left py-1 px-1">
+            <div className="font-bold text-base text-forest flex items-center gap-2">
+              <span>✉️</span> Check your email
+            </div>
+            <div className="text-xs text-charcoal/90 leading-relaxed mt-0.5">
+              We've sent you a confirmation link. The email will come from <strong>Supabase</strong>. Please open it and click <strong>Confirm</strong> to verify your account.
+            </div>
+          </div>
+        ), {
+          duration: 4000,
+          style: {
+            background: '#ffffff',
+            color: '#1a382b',
+            border: '1px solid #10b981',
+            padding: '12px 16px',
+            borderRadius: '16px',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+            maxWidth: '420px',
+          },
+          icon: null,
+        })
+      } else {
+        toast.success('Account created successfully!')
+      }
+
       navigate('/account', { replace: true })
     } catch (err) {
       console.error(err)

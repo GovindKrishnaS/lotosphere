@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 import { AuthProvider } from '@/context/AuthContext'
 import { CartProvider } from '@/context/CartContext'
@@ -7,7 +7,6 @@ import { CartProvider } from '@/context/CartContext'
 import Layout from '@/layouts/Layout'
 
 // Route Guards
-import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import AdminRoute from '@/components/auth/AdminRoute'
 
 // Pages
@@ -16,21 +15,13 @@ import Shop from '@/pages/Shop'
 import ProductDetails from '@/pages/ProductDetails'
 import PlantCarePage from '@/pages/PlantCarePage'
 import About from '@/pages/About'
+import OurStory from '@/pages/OurStory'
 import Checkout from '@/pages/Checkout'
 import OrderSuccess from '@/pages/OrderSuccess'
 import NotFound from '@/pages/NotFound'
 
-// Auth Pages
-import Login from '@/pages/auth/Login'
-import Signup from '@/pages/auth/Signup'
-import ForgotPassword from '@/pages/auth/ForgotPassword'
-
-// User Account Pages
-import AccountDashboard from '@/pages/account/AccountDashboard'
-import OrdersPage from '@/pages/account/OrdersPage'
-import OrderDetailPage from '@/pages/account/OrderDetailPage'
-
 // Admin Pages
+import AdminLogin from '@/pages/admin/AdminLogin'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminProducts from '@/pages/admin/AdminProducts'
 import AdminOrders from '@/pages/admin/AdminOrders'
@@ -62,41 +53,18 @@ export default function App() {
               <Route path="products/:slug" element={<ProductDetails />} />
               <Route path="plant-care" element={<PlantCarePage />} />
               <Route path="about" element={<About />} />
+              <Route path="our-story" element={<OurStory />} />
 
-              {/* Auth Routes */}
-              <Route path="auth/login" element={<Login />} />
-              <Route path="auth/signup" element={<Signup />} />
-              <Route path="auth/forgot-password" element={<ForgotPassword />} />
+              {/* Redirect Customer Auth/Account paths */}
+              <Route path="auth/*" element={<Navigate to="/" replace />} />
+              <Route path="account/*" element={<Navigate to="/" replace />} />
 
               {/* Checkout & Order Success */}
               <Route path="checkout" element={<Checkout />} />
               <Route path="order-success/:id" element={<OrderSuccess />} />
 
-              {/* User Account (Protected) */}
-              <Route
-                path="account"
-                element={
-                  <ProtectedRoute>
-                    <AccountDashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="account/orders"
-                element={
-                  <ProtectedRoute>
-                    <OrdersPage />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="account/orders/:id"
-                element={
-                  <ProtectedRoute>
-                    <OrderDetailPage />
-                  </ProtectedRoute>
-                }
-              />
+              {/* Admin Login Route */}
+              <Route path="admin/login" element={<AdminLogin />} />
 
               {/* Admin Portal (Protected Admin) */}
               <Route

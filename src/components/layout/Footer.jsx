@@ -1,6 +1,45 @@
 import { Link } from 'react-router-dom'
 import { Leaf, Mail, MapPin, Globe, Sparkles } from 'lucide-react'
 
+function InstagramIcon({ size = 15, className = "" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+    </svg>
+  )
+}
+
+function YoutubeIcon({ size = 15, className = "" }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.56 49.56 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
+      <polygon points="10 15 15 12 10 9 10 15" />
+    </svg>
+  )
+}
+
 const footerLinks = {
   Botanicals: [
     { label: 'All Plants', to: '/shop' },
@@ -12,12 +51,13 @@ const footerLinks = {
   Knowledge: [
     { label: 'Plant Care Guide', to: '/plant-care' },
     { label: 'Species Diagnostic', to: '/#plant-finder' },
+    { label: 'Our Story', to: '/our-story' },
     { label: 'Botanical Heritage', to: '/about' },
   ],
-  Account: [
-    { label: 'Member Profile', to: '/account' },
-    { label: 'Order Tracking', to: '/account' },
-    { label: 'Care Consultations', to: '/about' },
+  Sanctuary: [
+    { label: 'Botanical Concierge', to: '/about' },
+    { label: 'Care Consultations', to: '/plant-care' },
+    { label: 'Living Guarantee', to: '/about' },
   ],
 }
 
@@ -45,7 +85,7 @@ export default function Footer() {
             </p>
             <div className="flex items-center gap-3 mt-7">
               <a
-                href="https://lotosphere.com"
+                href="https://lotosphere.vercel.app"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#091510] border border-emerald-900/60 hover:border-emerald-500/50 hover:bg-emerald-950 transition-all text-[#a39e8f] hover:text-white"
@@ -54,11 +94,29 @@ export default function Footer() {
                 <Globe size={15} />
               </a>
               <a
-                href="mailto:concierge@lotosphere.com"
+                href="mailto:lotospheres@gmail.com"
                 className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#091510] border border-emerald-900/60 hover:border-emerald-500/50 hover:bg-emerald-950 transition-all text-[#a39e8f] hover:text-white"
                 aria-label="Email"
               >
                 <Mail size={15} />
+              </a>
+              <a
+                href="https://www.instagram.com/lotosphere"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#091510] border border-emerald-900/60 hover:border-emerald-500/50 hover:bg-emerald-950 transition-all text-[#a39e8f] hover:text-white"
+                aria-label="Instagram"
+              >
+                <InstagramIcon size={15} />
+              </a>
+              <a
+                href="https://www.youtube.com/@lotosphere"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-9 h-9 rounded-xl flex items-center justify-center bg-[#091510] border border-emerald-900/60 hover:border-emerald-500/50 hover:bg-emerald-950 transition-all text-[#a39e8f] hover:text-white"
+                aria-label="YouTube"
+              >
+                <YoutubeIcon size={15} />
               </a>
             </div>
           </div>

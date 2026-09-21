@@ -1,69 +1,176 @@
 import { supabase } from '@/lib/supabase'
 
-// Initial fallback feedback dataset
+// Fallback datasets for offline mode & local demo state
 let localPlantReviews = [
   {
     id: 'rev-1',
     customer_name: 'Elena Vance',
-    product_id: 'prod-1',
+    product_id: 'd1000000-0000-0000-0000-000000000001',
     product_name: 'Monstera Deliciosa',
     rating: 5,
     review: 'The split leaves on this Monstera are breathtaking. Arrived in pristine condition with lush aerial roots!',
     photo_url: 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=600&q=80',
     status: 'featured',
+    is_demo: true,
     created_at: '2026-03-10T10:00:00Z',
   },
   {
     id: 'rev-2',
     customer_name: 'Marcus Thorne',
-    product_id: 'prod-2',
-    product_name: 'Snake Plant Laurentii',
+    product_id: 'd1000000-0000-0000-0000-000000000001',
+    product_name: 'Monstera Deliciosa',
     rating: 5,
-    review: 'Survived 3 weeks while I was on vacation without a single droop. The ultimate indestructible plant.',
+    review: 'Thriving impeccably in my living room corner! New fenestrated leaves unfurled within two weeks.',
     photo_url: 'https://images.unsplash.com/photo-1593482892290-f54927ae1bac?auto=format&fit=crop&w=600&q=80',
-    status: 'featured',
+    status: 'approved',
+    is_demo: true,
     created_at: '2026-03-12T14:30:00Z',
   },
   {
     id: 'rev-3',
     customer_name: 'Sophia Chen',
-    product_id: 'prod-3',
-    product_name: 'Peace Lily Symphony',
+    product_id: 'd1000000-0000-0000-0000-000000000001',
+    product_name: 'Monstera Deliciosa',
     rating: 5,
-    review: 'Pure botanical elegance. The stark white spathes against deep obsidian soil bring serene tranquility to my studio.',
+    review: 'Pure botanical elegance. The stark dark green foliage brings calm tranquility to my home studio.',
     photo_url: 'https://images.unsplash.com/photo-1593691509543-c55fb32e7355?auto=format&fit=crop&w=600&q=80',
     status: 'featured',
+    is_demo: true,
     created_at: '2026-03-14T09:15:00Z',
+  },
+]
+
+let localCompanyReviews = [
+  {
+    id: 'crev-1',
+    customer_name: 'Julian Sterling',
+    customer_title: 'Landscape Architect, Kochi',
+    rating: 5,
+    review: 'Lotosphere has redefined how I interact with living spaces. Packaging was eco-friendly and 100% plastic-free with pristine healthy specimens.',
+    photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&q=80',
+    status: 'featured',
+    is_featured: true,
+    is_demo: true,
+    created_at: '2026-03-01T11:20:00Z',
+  },
+  {
+    id: 'crev-2',
+    customer_name: 'Amara Okafor',
+    customer_title: 'Interior Designer, Mumbai',
+    rating: 5,
+    review: 'The plant soulmate quiz matched me with a Calathea that thrives in my low-light apartment. Phenomenal customer support and botanical quality!',
+    photo_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80',
+    status: 'featured',
+    is_featured: true,
+    is_demo: true,
+    created_at: '2026-03-05T16:45:00Z',
+  },
+  {
+    id: 'crev-3',
+    customer_name: 'David Vance',
+    customer_title: 'Botanical Enthusiast, Bengaluru',
+    rating: 5,
+    review: 'Exceptional specimens delivered straight from solar nurseries. Each plant comes in mineral pots with tailored care guides.',
+    photo_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&q=80',
+    status: 'featured',
+    is_featured: true,
+    is_demo: true,
+    created_at: '2026-03-08T12:00:00Z',
   },
 ]
 
 let localCompanyFeedback = [
   {
     id: 'fb-1',
-    customer_name: 'Julian Sterling',
+    customer_name: 'Ananya Sharma',
+    email: 'ananya@example.com',
     rating: 5,
-    feedback: 'Lotosphere has redefined how I interact with living spaces. Packaging was eco-friendly and 100% plastic-free.',
-    status: 'featured',
-    created_at: '2026-03-01T11:20:00Z',
+    feedback: 'Loved the fast delivery, but would appreciate more pet-friendly plant guides in the mobile care section.',
+    status: 'pending',
+    is_demo: true,
+    created_at: '2026-03-15T08:30:00Z',
   },
   {
     id: 'fb-2',
-    customer_name: 'Amara Okafor',
-    rating: 5,
-    feedback: 'The plant soulmate quiz matched me with a Calathea that thrives in my low-light apartment. Phenomenal customer support!',
-    status: 'approved',
-    created_at: '2026-03-05T16:45:00Z',
+    customer_name: 'Vikram Mehta',
+    email: 'vikram@example.com',
+    rating: 4,
+    feedback: 'The bio-degradable planter packaging was excellent. Could you add WhatsApp order tracking updates?',
+    status: 'reviewed',
+    is_demo: true,
+    created_at: '2026-03-18T14:10:00Z',
   },
 ]
 
 export const feedbackService = {
-  // Public: Get featured & approved plant reviews
-  async getFeaturedPlantReviews() {
+  // ── 1. PLANT REVIEWS (Product-specific) ───────────────────────────
+  
+  async getPlantReviewsByProductId(productId) {
     if (supabase) {
       try {
         const { data, error } = await supabase
           .from('plant_reviews')
           .select('*, products(name)')
+          .eq('product_id', productId)
+          .in('status', ['approved', 'featured'])
+          .order('created_at', { ascending: false })
+
+        if (!error && data) {
+          return data
+        }
+      } catch (err) {
+        console.warn('Supabase plant reviews query failed:', err.message)
+      }
+    }
+    return localPlantReviews.filter(
+      r => r.product_id === productId && (r.status === 'approved' || r.status === 'featured')
+    )
+  },
+
+  async submitPlantReview(reviewData) {
+    if (!reviewData.productId) {
+      throw new Error('Product ID is required to submit a plant review')
+    }
+
+    const payload = {
+      customer_name: reviewData.customerName,
+      product_id: reviewData.productId,
+      rating: Number(reviewData.rating) || 5,
+      review: reviewData.review,
+      photo_url: reviewData.photoUrl || null,
+      status: 'pending',
+      is_demo: false,
+    }
+
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('plant_reviews')
+        .insert([payload])
+        .select('*, products(name)')
+        .single()
+
+      if (error) throw error
+      if (data) return data
+    }
+
+    const localItem = {
+      id: `rev-${Date.now()}`,
+      ...payload,
+      product_name: reviewData.productName || 'Plant Specimen',
+      created_at: new Date().toISOString(),
+    }
+    localPlantReviews.unshift(localItem)
+    return localItem
+  },
+
+  // ── 2. COMPANY REVIEWS (Homepage Testimonials) ────────────────────
+
+  async getFeaturedCompanyReviews() {
+    if (supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('company_reviews')
+          .select('*')
           .in('status', ['approved', 'featured'])
           .order('created_at', { ascending: false })
 
@@ -71,150 +178,176 @@ export const feedbackService = {
           return data
         }
       } catch (err) {
-        console.warn('Supabase fetch failed, fallback to local reviews:', err.message)
+        console.warn('Supabase company reviews query failed:', err.message)
       }
     }
-    return localPlantReviews.filter(r => r.status === 'approved' || r.status === 'featured')
+    return localCompanyReviews.filter(
+      r => r.status === 'approved' || r.status === 'featured' || r.is_featured
+    )
   },
 
-  // Public: Submit Plant Review
-  async submitPlantReview(reviewData) {
-    if (supabase) {
-      try {
-        const { data, error } = await supabase
-          .from('plant_reviews')
-          .insert([
-            {
-              customer_name: reviewData.customerName,
-              product_id: reviewData.productId || null,
-              rating: reviewData.rating,
-              review: reviewData.review,
-              photo_url: reviewData.photoUrl || null,
-              status: 'pending',
-            },
-          ])
-          .select()
-
-        if (!error && data) return data[0]
-      } catch (err) {
-        console.warn('Supabase insert failed, fallback local store:', err.message)
-      }
-    }
-
-    const newRev = {
-      id: `rev-${Date.now()}`,
+  async submitCompanyReview(reviewData) {
+    const payload = {
       customer_name: reviewData.customerName,
-      product_id: reviewData.productId || 'prod-1',
-      rating: reviewData.rating,
+      customer_title: reviewData.customerTitle || 'Verified Customer',
+      rating: Number(reviewData.rating) || 5,
       review: reviewData.review,
       photo_url: reviewData.photoUrl || null,
       status: 'pending',
+      is_featured: false,
+      is_demo: false,
+    }
+
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('company_reviews')
+        .insert([payload])
+        .select()
+        .single()
+
+      if (error) throw error
+      if (data) return data
+    }
+
+    const localItem = {
+      id: `crev-${Date.now()}`,
+      ...payload,
       created_at: new Date().toISOString(),
     }
-    localPlantReviews.unshift(newRev)
-    return newRev
+    localCompanyReviews.unshift(localItem)
+    return localItem
   },
 
-  // Public: Submit Company Feedback
+  // ── 3. COMPANY FEEDBACK (Private Customer Service) ────────────────
+
   async submitCompanyFeedback(feedbackData) {
-    if (supabase) {
-      try {
-        const { data, error } = await supabase
-          .from('company_feedback')
-          .insert([
-            {
-              customer_name: feedbackData.customerName,
-              rating: feedbackData.rating,
-              feedback: feedbackData.feedback,
-              status: 'pending',
-            },
-          ])
-          .select()
-
-        if (!error && data) return data[0]
-      } catch (err) {
-        console.warn('Supabase insert failed, fallback local store:', err.message)
-      }
-    }
-
-    const newFb = {
-      id: `fb-${Date.now()}`,
+    const payload = {
       customer_name: feedbackData.customerName,
-      rating: feedbackData.rating,
+      email: feedbackData.email || null,
+      rating: Number(feedbackData.rating) || 5,
       feedback: feedbackData.feedback,
       status: 'pending',
+      is_demo: false,
+    }
+
+    if (supabase) {
+      const { data, error } = await supabase
+        .from('company_feedback')
+        .insert([payload])
+        .select()
+        .single()
+
+      if (error) throw error
+      if (data) return data
+    }
+
+    const localItem = {
+      id: `fb-${Date.now()}`,
+      ...payload,
       created_at: new Date().toISOString(),
     }
-    localCompanyFeedback.unshift(newFb)
-    return newFb
+    localCompanyFeedback.unshift(localItem)
+    return localItem
   },
 
-  // Admin: Get all feedback (Plant Reviews + Company Feedback)
-  async getAllFeedbackAdmin() {
+  // ── 4. ADMIN MANAGEMENT METHODS ────────────────────────────────────
+
+  async getAllReviewsAndFeedbackAdmin() {
+    let plantRevs = []
+    let compRevs = []
+    let compFb = []
+
     if (supabase) {
       try {
-        const { data: plantRevs, error: pErr } = await supabase
-          .from('plant_reviews')
-          .select('*, products(name)')
-          .order('created_at', { ascending: false })
+        const [pRes, cRes, fRes] = await Promise.all([
+          supabase.from('plant_reviews').select('*, products(name, slug)').order('created_at', { ascending: false }),
+          supabase.from('company_reviews').select('*').order('created_at', { ascending: false }),
+          supabase.from('company_feedback').select('*').order('created_at', { ascending: false }),
+        ])
 
-        const { data: compFb, error: cErr } = await supabase
-          .from('company_feedback')
-          .select('*')
-          .order('created_at', { ascending: false })
+        if (!pRes.error) plantRevs = pRes.data || []
+        if (!cRes.error) compRevs = cRes.data || []
+        if (!fRes.error) compFb = fRes.data || []
 
-        if (!pErr && !cErr && plantRevs && compFb) {
-          return { plantReviews: plantRevs, companyFeedback: compFb }
+        if (!pRes.error || !cRes.error || !fRes.error) {
+          return {
+            plantReviews: plantRevs.length ? plantRevs : localPlantReviews,
+            companyReviews: compRevs.length ? compRevs : localCompanyReviews,
+            companyFeedback: compFb.length ? compFb : localCompanyFeedback,
+          }
         }
       } catch (err) {
-        console.warn('Admin feedback fetch failed, fallback local:', err.message)
+        console.warn('Admin reviews fetch exception:', err.message)
       }
     }
 
     return {
       plantReviews: [...localPlantReviews],
+      companyReviews: [...localCompanyReviews],
       companyFeedback: [...localCompanyFeedback],
     }
   },
 
-  // Admin: Update feedback status ('approved', 'rejected', 'featured', 'hidden')
-  async updateFeedbackStatus(type, id, status) {
+  async updatePlantReviewStatus(id, status) {
     if (supabase) {
-      try {
-        const table = type === 'plant' ? 'plant_reviews' : 'company_feedback'
-        const { error } = await supabase
-          .from(table)
-          .update({ status, updated_at: new Date().toISOString() })
-          .eq('id', id)
+      const { error } = await supabase
+        .from('plant_reviews')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', id)
 
-        if (!error) return true
-      } catch (err) {
-        console.warn('Update feedback status failed:', err.message)
-      }
+      if (error) throw error
+      return true
     }
-
-    if (type === 'plant') {
-      localPlantReviews = localPlantReviews.map(item => item.id === id ? { ...item, status } : item)
-    } else {
-      localCompanyFeedback = localCompanyFeedback.map(item => item.id === id ? { ...item, status } : item)
-    }
+    localPlantReviews = localPlantReviews.map(item => item.id === id ? { ...item, status } : item)
     return true
   },
 
-  // Admin: Delete feedback
-  async deleteFeedback(type, id) {
+  async updateCompanyReview(id, updates) {
     if (supabase) {
-      try {
-        const table = type === 'plant' ? 'plant_reviews' : 'company_feedback'
-        const { error } = await supabase.from(table).delete().eq('id', id)
-        if (!error) return true
-      } catch (err) {
-        console.warn('Delete feedback failed:', err.message)
-      }
+      const { error } = await supabase
+        .from('company_reviews')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', id)
+
+      if (error) throw error
+      return true
+    }
+    localCompanyReviews = localCompanyReviews.map(item => item.id === id ? { ...item, ...updates } : item)
+    return true
+  },
+
+  async updateCompanyFeedbackStatus(id, status) {
+    if (supabase) {
+      const { error } = await supabase
+        .from('company_feedback')
+        .update({ status, updated_at: new Date().toISOString() })
+        .eq('id', id)
+
+      if (error) throw error
+      return true
+    }
+    localCompanyFeedback = localCompanyFeedback.map(item => item.id === id ? { ...item, status } : item)
+    return true
+  },
+
+  async deleteItem(type, id) {
+    const tableMap = {
+      plant: 'plant_reviews',
+      company_review: 'company_reviews',
+      feedback: 'company_feedback',
+    }
+    const table = tableMap[type]
+
+    if (supabase && table) {
+      const { error } = await supabase.from(table).delete().eq('id', id)
+      if (error) throw error
+      return true
     }
 
     if (type === 'plant') {
       localPlantReviews = localPlantReviews.filter(item => item.id !== id)
+    } else if (type === 'company_review') {
+      localCompanyReviews = localCompanyReviews.filter(item => item.id !== id)
     } else {
       localCompanyFeedback = localCompanyFeedback.filter(item => item.id !== id)
     }

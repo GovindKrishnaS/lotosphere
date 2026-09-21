@@ -6,6 +6,7 @@ import { getProductBySlug, getProducts } from '@/services/productService'
 import { useCart } from '@/context/CartContext'
 import { formatCurrency } from '@/utils'
 import ProductCard from '@/components/product/ProductCard'
+import PlantReviewList from '@/components/product/PlantReviewList'
 import { ProductCardSkeleton } from '@/components/ui/Skeletons'
 import toast from 'react-hot-toast'
 
@@ -273,6 +274,9 @@ export default function ProductDetails() {
             </div>
           </div>
         </div>
+
+        {/* Plant Reviews Section */}
+        <PlantReviewList product={product} />
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
